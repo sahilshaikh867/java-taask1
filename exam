@@ -1,0 +1,157 @@
+import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
+
+class User {
+    private String username;
+    private String password;
+    private String profile;
+
+    public User(String username, String password, String profile) {
+        this.username = username;
+        this.password = password;
+        this.profile = profile;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
+    }
+}
+
+class MCQs {
+    private String question;
+    private String[] options;
+    private int correctAnswerIndex;
+
+    public MCQs(String question, String[] options, int correctAnswerIndex) {
+        this.question = question;
+        this.options = options;
+        this.correctAnswerIndex = correctAnswerIndex;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public String[] getOptions() {
+        return options;
+    }
+
+    public int getCorrectAnswerIndex() {
+        return correctAnswerIndex;
+    }
+}
+
+public class OnlineExamSystem {
+    private static User currentUser;
+    private static Timer timer;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        currentUser = login(scanner);
+
+        if (currentUser != null) {
+            System.out.println("Login successful. Welcome, " + currentUser.getUsername() + "!");
+            updateProfile(scanner);
+
+            MCQs mcqs = new MCQs("What is the capital of France?",
+                    new String[]{"A. London", "B. Paris", "C. Rome", "D. Berlin"}, 1);
+            attemptMCQs(scanner, mcqs);
+
+            startTimer(10); // 10 seconds timer
+            // Perform other exam tasks...
+
+            closeSession();
+        } else {
+            System.out.println("Login failed. Exiting...");
+        }
+    }
+
+    private static User login(Scanner scanner) {
+        System.out.print("Enter username: ");
+        String username = scanner.nextLine();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+        // Authenticate user (dummy implementation)
+        if (username.equals("admin") && password.equals("admin123")) {
+            return new User(username, password, "Student");
+        } else {
+            return null;
+        }
+    }
+
+    private static void updateProfile(Scanner scanner) {
+        System.out.print("Do you want to update your password? (yes/no): ");
+        String choice = scanner.nextLine();
+        if (choice.equalsIgnoreCase("yes")) {
+            System.out.print("Enter new password: ");
+            String newPassword = scanner.nextLine();
+            currentUser.setPassword(newPassword);
+            System.out.println("Password updated successfully.");
+        }
+
+        System.out.println("Profile updated successfully.");
+    }
+
+    private static void attemptMCQs(Scanner scanner, MCQs mcqs) {
+        System.out.println("Question: " + mcqs.getQuestion());
+        for (String option : mcqs.getOptions()) {
+            System.out.println(option);
+        }
+
+        System.out.print("Enter your answer (A/B/C/D): ");
+        String answer = scanner.nextLine();
+
+        if (answer.equalsIgnoreCase("A") || answer.equalsIgnoreCase("B") ||
+                answer.equalsIgnoreCase("C") || answer.equalsIgnoreCase("D")) {
+            int selectedAnswerIndex = answer.charAt(0) - 'A';
+            if (selectedAnswerIndex == mcqs.getCorrectAnswerIndex()) {
+                System.out.println("Correct answer!");
+            } else {
+                System.out.println("Incorrect answer!");
+            }
+        } else {
+            System.out.println("Invalid answer format.");
+        }
+    }
+
+    private static void startTimer(int seconds) {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                System.out.println("\nTime's up! Submitting exam automatically.");
+                closeSession();
+            }
+        }, seconds * 1000);
+    }
+
+    private static void closeSession() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        System.out.println("Session closed.");
+        logout();
+    }
+
+    private static void logout() {
+        System.out.println("Logging out. Goodbye, " + currentUser.getUsername() + "!");
+        currentUser = null;
+    }
+}
