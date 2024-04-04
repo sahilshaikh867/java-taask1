@@ -1,0 +1,83 @@
+import java.util.ArrayList;
+import java.util.List;
+
+class Flight {
+    private String flightNumber;
+    private String origin;
+    private String destination;
+    private int capacity;
+    private int bookedSeats;
+
+    public Flight(String flightNumber, String origin, String destination, int capacity) {
+        this.flightNumber = flightNumber;
+        this.origin = origin;
+        this.destination = destination;
+        this.capacity = capacity;
+        this.bookedSeats = 0;
+    }
+
+    public String getFlightNumber() {
+        return flightNumber;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public String getDestination() {
+        return destination;
+    }
+
+    public int getAvailableSeats() {
+        return capacity - bookedSeats;
+    }
+
+    public boolean bookSeat() {
+        if (bookedSeats < capacity) {
+            bookedSeats++;
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+class ReservationSystem {
+    private List<Flight> flights;
+
+    public ReservationSystem() {
+        this.flights = new ArrayList<>();
+    }
+
+    public void addFlight(Flight flight) {
+        flights.add(flight);
+    }
+
+    public boolean bookFlight(String flightNumber) {
+        for (Flight flight : flights) {
+            if (flight.getFlightNumber().equals(flightNumber)) {
+                return flight.bookSeat();
+            }
+        }
+        return false;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        ReservationSystem reservationSystem = new ReservationSystem();
+
+        // Adding some example flights
+        reservationSystem.addFlight(new Flight("ABC123", "New York", "Los Angeles", 200));
+        reservationSystem.addFlight(new Flight("XYZ789", "London", "Paris", 150));
+
+        // Booking example seats
+        boolean success1 = reservationSystem.bookFlight("ABC123");
+        boolean success2 = reservationSystem.bookFlight("XYZ789");
+        boolean success3 = reservationSystem.bookFlight("ABC123"); // Attempting to book more seats than available
+
+        System.out.println("Booking success for ABC123: " + success1);
+        System.out.println("Booking success for XYZ789: " + success2);
+        System.out.println("Booking success for ABC123: " + success3);
+    }
+}
